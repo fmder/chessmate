@@ -3,7 +3,7 @@ import unittest
 import numpy
 import pandas
 
-from chess_player import dataset
+from chessmate.data import dataset
 
 
 class TestBuildIndexTable(unittest.TestCase):
