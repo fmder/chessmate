@@ -9,14 +9,14 @@ import numpy
 import pandas
 from torch.utils.data import Dataset
 
-from .nnue_pytorch import halfkp
-from . import utils
+from ..nnue_pytorch import halfkp
+from .. import utils
 
 
 def _preprocess_3500k_san(content: io.BytesIO) -> pandas.DataFrame:
     data = content.read()
-    data = re.sub("###\s(.*?)\s?$", "\"\g<1>\"", data, flags=re.MULTILINE)
-    data = re.sub("[WB]\d+\.", "", data)
+    data = re.sub(r"###\s(.*?)\s?$", r"\"\g<1>\"", data, flags=re.MULTILINE)
+    data = re.sub(r"[WB]\d+\.", "", data)
     data = io.StringIO(data)
 
     df = pandas.read_csv(data,
@@ -53,7 +53,7 @@ def _fetch_3500k_san():
     return content
 
 
-def load_3500k_san() -> pandas.DafaFrame:
+def load_3500k_san() -> pandas.DataFrame:
     # TODO: Find data root
     path = pathlib.Path("../data/3500k_san.feather")
     if path.exists():
