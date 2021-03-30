@@ -1,0 +1,1 @@
+All files under this directory are from https://github.com/glinscott/nnue-pytorch

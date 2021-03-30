@@ -1,0 +1,7 @@
+numpy
+pandas
+pyarrow
+python-chess
+requests
+tqdm
+torch
