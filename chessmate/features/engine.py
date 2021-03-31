@@ -20,7 +20,7 @@ class EngineFeature:
 
     def _get_pov_score(self, board, pov, depth, mate_score=1000):
         analysis = self.engine.analyse(board, chess.engine.Limit(depth=depth))
-        pov_score = analysis["score"].pov(pov, mate_score)
+        pov_score = analysis["score"].pov(pov).score(mate_score=mate_score)
         return pov_score
 
 
@@ -33,34 +33,41 @@ class RawMaterialScores(EngineFeature):
 
         if depth is not None:
             self.depth = depth
-            self.plies = list(range(self.depth))
+            self.use_ply = [True] * depth
         elif relative_plies is not None:
             self.depth = max(relative_plies)
-            self.plies = sorted(relative_plies)
+            self.use_ply = [i in relative_plies for i in range(self.depth)]
+
+        self._feature_length = sum(self.use_ply) + 1
+
+    def _raw_material_score(self, board) -> float:
+        return sum(MATERIAL_VALUE[p.symbol()] for _, p in board.piece_map().items())
 
     def __call__(self, board: chess.Board) -> list[float]:
-        material_scores: list[float] = list()
-        plies = iter(self.plies)
-        next_ply = next(plies)
+        # First move is already done, get current material score
+        material_scores: list[float] = [self._raw_material_score(board)]
 
         # We are in a situation where we evaluate a given move (already played here).
         # So if we want to evaluate the value of a move it is the value as the
         # other player (which is ours!)
         us = not board.turn
 
-        for i, move in enumerate(self._get_line(board, self.depth)):
-            board.push_uci(move.uci())
-            if next_ply != i:
+        line = self._get_line(board, self.depth + 2)
+        for move, use_ply in zip(line, self.use_ply):
+            board.push(move)
+            if not use_ply:
                 continue
 
-            score = sum(MATERIAL_VALUE[p.symbol()] for _, p in board.piece_map().items())
+            score = self._raw_material_score(board)
 
             if us == chess.BLACK:
                 # Invert black score
                 score *= -1
 
             material_scores.append(score)
-            next_ply = next(plies)
+
+        if len(material_scores) < self._feature_length:
+            material_scores += [float("nan")] * (self._feature_length - len(material_scores))
 
         return material_scores
 
