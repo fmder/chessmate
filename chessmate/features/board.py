@@ -1,12 +1,13 @@
 from functools import partial
 
-from .. import nnue_pytorch
+from ..nnue_pytorch import halfka as nnue_halfka
+from ..nnue_pytorch import halfkp as nnue_halfkp
 
 
-_halfkp = nnue_pytorch.halfkp.Features()
-_factorized_halfkp = nnue_pytorch.halfkp.FactorizedFeatures()
-_halfka = nnue_pytorch.halfka.Features()
-_factorized_halfka = nnue_pytorch.halfka.FactorizedFeatures()
+_halfka = nnue_halfka.Features()
+_factorized_halfka = nnue_halfka.FactorizedFeatures()
+_halfkp = nnue_halfkp.Features()
+_factorized_halfkp = nnue_halfkp.FactorizedFeatures()
 
 
 def _configurable_board_repr(board, *, f=None):
@@ -18,7 +19,7 @@ def _configurable_board_repr(board, *, f=None):
     return current, other
 
 
-halfkp = partial(_configurable_board_repr, f=_halfkp)
-factorized_halfkp = partial(_configurable_board_repr, f=_factorized_halfkp)
 halfka = partial(_configurable_board_repr, f=_halfka)
 factorized_halfka = partial(_configurable_board_repr, f=_factorized_halfka)
+halfkp = partial(_configurable_board_repr, f=_halfkp)
+factorized_halfkp = partial(_configurable_board_repr, f=_factorized_halfkp)
